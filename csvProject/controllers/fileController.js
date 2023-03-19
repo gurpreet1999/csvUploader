@@ -7,8 +7,8 @@ const csv = require("csv-parser");
 const fs = require("fs");
 
 var DataInCurrentPagination = []; //this array will help to sort the current pagination data
-let uploadFileName = [];
-let csvParseData = []; //this array
+let uploadFileName = []; //this array contain all the files
+let csvParseData = []; //this array contain the current selected file data
 let lengthOfData;
 
 //function to upload the file in uploads folder
@@ -39,14 +39,14 @@ function exportFile(req, res) {
 //for opening the csv file and display its content in a tabular form
 
 async function parsingCSV(req, res) {
-    uploadFileName = fs.readdirSync(path.join(__dirname, "../", "uploads")); 
+  uploadFileName = fs.readdirSync(path.join(__dirname, "../", "uploads"));
   csvParseData = []; //this array is for storing the current file data in json format
 
   const index = req.query.index;
-  let filePath =path.join(__dirname, "../", "/uploads", uploadFileName[index]);
+  let filePath = path.join(__dirname, "../", "/uploads", uploadFileName[index]);
 
   if (!path) {
-   return  res.redirect("back");
+    return res.redirect("back");
   }
   fs.createReadStream(filePath)
     .pipe(csv())
@@ -64,7 +64,8 @@ async function parsingCSV(req, res) {
     });
 }
 
-function deleteFile(req,res) {
+//function to delete the selected  file
+function deleteFile(req, res) {
   let index = req.query.index;
 
   try {
@@ -73,12 +74,7 @@ function deleteFile(req,res) {
     return;
   }
   if (files.length > 0) {
-    var filepath = path.join(
-      __dirname,
-      "../",
-      "uploads",
-      files[index]
-    );
+    var filepath = path.join(__dirname, "../", "uploads", files[index]);
     if (fs.statSync(filepath).isFile()) {
       fs.unlinkSync(filepath);
     }
@@ -88,6 +84,7 @@ function deleteFile(req,res) {
   return res.redirect("back");
 }
 
+//this function will show table data in 5 page and each page will have 100 data
 function showTableData(req, res) {
   let index = req.params.id || 1;
 
@@ -108,10 +105,11 @@ function showTableData(req, res) {
   });
 }
 
+//to sort  any field in asc or desc
 function sorting(req, res) {
   let value = req.params.val;
-var field=req.params.field
-console.log(field)
+  var field = req.params.field;
+  console.log(field);
 
   console.log(value);
   let data;
@@ -147,41 +145,29 @@ console.log(field)
   });
 }
 
+//to search the data in the table.... u can search any filed
 function searching(req, res) {
-
   let searchArray = [];
-let search=req.body.search
- 
+  let search = req.body.search;
+
   if (!search) {
     return res.redirect("/v1/file/open/?index=0");
   }
 
+  csvParseData.forEach((data) => {
+    for (const key in data) {
+      if (data[key].startsWith(search)) {
+        searchArray.push(data);
+      }
+    }
+  });
 
-
-
-
-csvParseData.forEach((data)=>{
-
-for(const key in data){
-
-if(data[key].startsWith(search)){
-  searchArray.push(data);
-
-}
-
-}
-
-
-})
-
-
-res.render("table", {
+  res.render("table", {
     csvData: searchArray,
     lengthOfData: searchArray / 100,
     data: "desc",
   });
 }
-
 
 module.exports = {
   uploadFile,
@@ -191,6 +177,5 @@ module.exports = {
   showTableData,
   sorting,
   searching,
- 
 };
 //ok

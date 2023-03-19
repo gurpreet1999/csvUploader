@@ -14,6 +14,7 @@
 <body>
 	
 	<main>
+		<!-- heading -->
 		<h1 class="h1-style">CSV Reader</h1>
 		<p class="p-style">Reads CSV file and display its content in tabular form</p><hr>
 		<p class="form-desc">Let's Upload New File (Only .CSV)</p>
@@ -21,6 +22,7 @@
 			<input type="file" accept=".csv" name="file" placeholder="Upload CSV File...">
 			<button type="submit" class="submit-button"><i class="fas fa-upload"></i></button>
 		</form>
+		<!-- conatiner to show all the uploaded files -->
 		<div id="files-container">
 			<% for(let i=0;i<files.length;i++){ %>
 				<div class="file">

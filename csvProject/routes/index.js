@@ -6,8 +6,9 @@ const fileRoute = require("./fileRoute.js")
 const indexRoute=express.Router()
 
 
-
+//home route
 indexRoute.get('/',exportFile)
+
 indexRoute.use('/file',fileRoute)
 
 
